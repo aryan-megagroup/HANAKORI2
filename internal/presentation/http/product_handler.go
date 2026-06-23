@@ -18,6 +18,8 @@ func NewProductHandler() *ProductHandler {
 }
 
 func (h *ProductHandler) GetSampleProducts(w http.ResponseWriter, r *http.Request) {
+
+	// TO DO:Temporary implementation. Scheduled to be changed to retrieval processing from a database, etc., in a future PR.
 	w.Header().Set("Content-Type", "application/json")
 
 	products := []Product{
