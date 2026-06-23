@@ -1,31 +1,70 @@
 package http
 
 import (
-	"encoding/json"
+	"hanakori2/internal/application/product"
 	"net/http"
+	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-type Product struct {
-	ID    int    `json:"id"`
-	Name  string `json:"name"`
-	Price int    `json:"price"`
+type ProductHandler struct {
+	getUseCase  *product.GetProductUseCase
+	cartUseCase *product.CartUseCase
 }
 
-type ProductHandler struct{}
-
-func NewProductHandler() *ProductHandler {
-	return &ProductHandler{}
+func NewProductHandler(g *product.GetProductUseCase, c *product.CartUseCase) *ProductHandler {
+	return &ProductHandler{
+		getUseCase:  g,
+		cartUseCase: c,
+	}
 }
 
-func (h *ProductHandler) GetSampleProducts(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) HandleGetProducts(c *gin.Context) {
+	category := c.Query("category")
+	products, err := h.getUseCase.Execute(category)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
 
-	// TO DO:Temporary implementation. Scheduled to be changed to retrieval processing from a database, etc., in a future PR.
-	w.Header().Set("Content-Type", "application/json")
-
-	products := []Product{
-		{ID: 1, Name: "Sample Product A", Price: 1500},
-		{ID: 2, Name: "Sample Product B", Price: 2800},
+func (h *ProductHandler) HandleGetProductByID(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid product ID"})
+		return
 	}
 
-	json.NewEncoder(w).Encode(products)
+	p, err := h.getUseCase.GetByID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, p)
+}
+
+func (h *ProductHandler) HandleGetCart(c *gin.Context) {
+	c.JSON(http.StatusOK, h.cartUseCase.GetCartItems())
+}
+
+func (h *ProductHandler) HandleAddToCart(c *gin.Context) {
+	var input struct {
+		ProductID int `json:"product_id"`
+		Quantity  int `json:"quantity"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedCart, err := h.cartUseCase.AddToCart(input.ProductID, input.Quantity)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, updatedCart)
 }

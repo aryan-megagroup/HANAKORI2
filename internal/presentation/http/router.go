@@ -1,17 +1,18 @@
 package http
 
-import (
-	"net/http"
-)
+import "github.com/gin-gonic/gin"
 
-func SetupRouter() *http.ServeMux {
-	mux := http.NewServeMux()
+func SetupRouter(handler *ProductHandler) *gin.Engine {
+	r := gin.Default()
 
-	fileServer := http.FileServer(http.Dir("./public"))
-	mux.Handle("/", fileServer)
+	apiGroup := r.Group("/api")
+	{
+		apiGroup.GET("/products", handler.HandleGetProducts)
+		apiGroup.GET("/products/:id", handler.HandleGetProductByID)
 
-	productHandler := NewProductHandler()
-	mux.HandleFunc("/api/products", productHandler.GetSampleProducts)
+		apiGroup.GET("/cart", handler.HandleGetCart)
+		apiGroup.POST("/cart", handler.HandleAddToCart)
+	}
 
-	return mux
+	return r
 }
