@@ -71,25 +71,33 @@ function setupImageUpload() {
 }
 
 function loadProducts() {
-    fetch('api/get_products.php')
+    // 1. Point to your Go port 8081 endpoint
+    fetch('http://localhost:8081/api/products')
         .then(res => res.json())
         .then(products => {
             globalProductsCache = products;
             const tbody = document.querySelector('#productsTable tbody');
             if (!tbody) return;
+            
+            // 2. Updated data field mappings from lowercase/snake_case to Go PascalCase keys
             tbody.innerHTML = products.map(p => `
                 <tr>
-                    <td><img src="${p.image_url}" class="product-img" style="width:50px; height:50px; object-fit:cover; border-radius:6px;" onerror="this.src='uploads/no-image.png'"></td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.category}</td>
-                    <td>¥${p.price}</td>
-                    <td><span class="badge ${p.is_available ? 'badge-success' : 'badge-danger'}">${p.is_available ? 'Available' : 'No'}</span></td>
+                    <td><img src="${p.ImageURL || 'uploads/no-image.png'}" class="product-img" style="width:50px; height:50px; object-fit:cover; border-radius:6px;" onerror="this.src='uploads/no-image.png'"></td>
+                    <td><strong>${escapeHtml(p.Name)}</strong></td>
+                    <td>${escapeHtml(p.Category)}</td>
+                    <td>¥${p.Price}</td>
+                    <td><span class="badge ${p.IsAvailable ? 'badge-success' : 'badge-danger'}">${p.IsAvailable ? 'Available' : 'No'}</span></td>
                     <td>
-                        <button class="action-btn action-btn-edit" onclick="editProduct(${p.menu_id})"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="action-btn action-btn-delete" onclick="deleteProduct(${p.menu_id})"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn action-btn-edit" onclick="editProduct(${p.MenuID})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="action-btn action-btn-delete" onclick="deleteProduct(${p.MenuID})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
+        })
+        .catch(err => {
+            console.error("Error loading products from Go backend:", err);
+            const tbody = document.querySelector('#productsTable tbody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Failed to connect to backend server.</td></tr>';
         });
 }
 

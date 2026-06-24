@@ -12,3 +12,8 @@ type CartItem struct {
 	Product  Product `json:"Product"`
 	Quantity int     `json:"Quantity"`
 }
+
+// Added to track admin-managed banners
+type SiteSettings struct {
+	PromoBanner string `json:"promo_banner"`
+}

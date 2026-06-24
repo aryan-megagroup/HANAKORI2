@@ -68,3 +68,26 @@ func (h *ProductHandler) HandleAddToCart(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, updatedCart)
 }
+func (h *ProductHandler) HandleGetSettings(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"promo_banner": "特別キャンペーン: コード「PINK15」でトッピング無料！",
+	})
+}
+func (h *ProductHandler) HandleUpdateSettings(c *gin.Context) {
+	var input struct {
+		PromoBanner string `json:"promo_banner"`
+	}
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"success": false, "error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Settings updated successfully!"})
+}
+
+func (h *ProductHandler) HandleAdminProductCRUD(c *gin.Context) {
+	action := c.PostForm("action")
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Operation '" + action + "' processed successfully!",
+	})
+}

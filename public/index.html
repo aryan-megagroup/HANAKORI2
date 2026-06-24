@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>華こおり - Shaved Ice Ordering Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div class="video-bg-container">
+        <video autoplay muted loop playsinline id="bg-video">
+            <!-- Connected to upload folder -->
+            <source src="uploads/I_want_you_to_create_a_animate.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>s
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="responsive-app-wrapper">
+        <aside class="sidebar-nav"> 
+            <div class="brand">
+                <!-- Connected to upload folder -->
+                <img src="uploads/mainlogo.png" alt="華こおり" class="brand-logo" style="width: 44px; height: 44px; object-fit: contain; border-radius: 8px;">
+                <h2>華こおり</h2>
+            </div>
+            <nav class="nav-links">
+                <a href="#" class="active" onclick="returnToMenuScreen()"><i class="fa-solid fa-house"></i> <span>Home</span></a>
+                <a href="#" onclick="promptManagerAccess(event)"><i class="fa-solid fa-crown"></i> <span>Manager</span></a>
+            </nav>
+            <div class="sidebar-footer" style="margin-top: auto;">
+                <a href="#" onclick="resetOrderSession()"><i class="fa-solid fa-right-from-bracket"></i> <span>Reset Session</span></a>
+            </div>
+        </aside>
+
+        <div class="main-layout">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <i class="fa-solid fa-bars mobile-menu-toggle" onclick="toggleSidebar()"></i>
+                    <div class="greeting">
+                        <h2>こんにちは 👋</h2>
+                        <p>お好きなかき氷をお選びください</p>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="search-bar" style="background: white; padding: 10px 16px; border-radius: 20px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                        <input type="text" placeholder="Search menu..." style="border: none; outline: none; background: transparent; font-family: var(--font-main);">
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <div class="menu-workspace" id="menuWorkspaceArea" style="display: flex; flex-direction: column; width: 100%; gap: 20px;">
+                    
+                    <div class="promo-banner" style="width: 100%; box-sizing: border-box; text-align: center; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); padding: 16px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md);">
+                        <span class="promo-text" style="font-weight: 700; color: var(--primary-text); letter-spacing: 1px;">🎉 SPECIAL TREATS 🎉</span>
+                        <div id="dynamicPromoBannerText" style="font-size: 1rem; font-weight: 700; color: var(--primary-text); margin-top: 8px; background: rgba(255,255,255,0.4); display: inline-block; padding: 6px 16px; border-radius: 20px;">
+                            Loading...
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; border-radius: 30px; padding: 8px 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: inline-flex; gap: 10px; overflow-x: auto; margin-bottom: 10px; width: fit-content; max-width: 100%;">
+                        <button class="tab-btn active" onclick="filterMenu('All', this)">すべて (All)</button>
+                        <button class="tab-btn" onclick="filterMenu('Snack', this)">スナック (Snacks)</button>
+                        <button class="tab-btn" onclick="filterMenu('Ice', this)">かき氷 (Kakigōri)</button>
+                    </div>
+
+                    <div id="menuContainer" class="responsive-menu-grid" style="width: 100%;">
+                        <div class="loading-state">商品を読み込んでいます...</div>
+                    </div>
+                </div>
+
+                <div class="menu-workspace" id="checkoutWorkspaceArea" style="display: none; background: white; padding: 30px; border-radius: 20px; border: 1px solid var(--border-soft); box-shadow: var(--shadow-lg);">
+                    <h2 style="margin-bottom: 20px; color: var(--text-dark); border-bottom: 2px solid var(--primary-color); padding-bottom: 10px;">
+                        <i class="fa-solid fa-cash-register" style="color: var(--primary-color);"></i> 最終確認画面 (Final Checkout)
+                    </h2>
+                    
+                    <div id="checkoutItemsList" style="margin-bottom: 24px; border: 1px solid var(--border-soft); border-radius: 12px; overflow: hidden;"></div>
+
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 14px; margin-bottom: 24px; border: 1px dashed #ccc;">
+                        <label style="font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="hasPromoCheckbox" onchange="togglePromoInputRow()" style="transform: scale(1.2); accent-color: var(--primary-color);">
+                            プロモーションコードをお持ちですか？ (Do you have a promo code?)
+                        </label>
+                        
+                        <div id="checkoutPromoRow" style="display: none; margin-top: 15px; gap: 10px; align-items: center;">
+                            <input type="text" id="checkoutPromoCode" placeholder="Enter promo code" style="padding: 12px; border-radius: 8px; border: 1px solid #ccc; width: 100%; font-size: 1rem; text-transform: uppercase;">
+                            <button class="payment-action-btn" style="width: auto; padding: 12px 24px; background: var(--text-dark); color: white;" onclick="applyCheckoutPromoCode()">Apply</button>
+                        </div>
+                        <div id="checkoutPromoMessage" style="margin-top: 8px; font-weight: 700; color: var(--secondary-color);"></div>
+                    </div>
+
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 14px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px;">
+                        <div style="display: flex; justify-content: space-between;"><span>小計 (Subtotal):</span><strong>¥<span id="coSubtotal">0</span></strong></div>
+                        <div style="display: flex; justify-content: space-between; color: var(--secondary-color);"><span>割引金額 (Discount):</span><strong>-¥<span id="coDiscount">0</span></strong></div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px solid #ddd; padding-top: 10px; font-size: 1.4rem; font-weight: 700;">
+                            <span>総合計 (Grand Total):</span><span style="color: var(--primary-text);">¥<span id="coGrandTotal">0</span></span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <button class="payment-action-btn" onclick="finalizeCheckoutSession()">
+                            <i class="fa-solid fa-check-double"></i> 最終確定 (Finalize Order)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-workspace" id="sidebarControlWorkspace">
+                    <section class="config-card">
+                        <h3><i class="fa-solid fa-chair" style="color: var(--primary-color);"></i> ご利用方法</h3>
+                        <div class="field-row">
+                            <select id="orderType" onchange="toggleSeatSelect()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; font-family: var(--font-main); outline: none;">
+                                <option value="Eat-in">店内飲食 (Eat-in)</option>
+                                <option value="Takeout">テイクアウト (Takeout)</option>
+                            </select>
+                        </div>
+                        <div class="field-row" id="seatRow" style="margin-top: 12px;">
+                            <div id="seatAssignmentStatus" style="font-weight: 700; color: var(--primary-text); padding: 12px; background: rgba(255, 192, 203, 0.3); border-radius: 8px; text-align: center; border: 1px solid var(--primary-color);">
+                                席番号を自動確認中...
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="config-card cart-card" style="flex-grow: 1;">
+                        <h3><i class="fa-solid fa-shopping-cart" style="color: var(--primary-color);"></i> Shopping Cart (<span id="cartCount">0</span>)</h3>
+                        <div id="cartItems" class="cart-items-container">
+                            <p style="text-align: center; color: #999;">Your cart is empty</p>
+                        </div>
+                    </section>
+
+                    <section class="config-card summary-sticky">
+                        <div class="summary-line price-line" style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px;">
+                            <span style="color: var(--text-muted); font-weight: 600;">Current Round:</span>
+                            <h2 style="font-size: 1.8rem;">¥<span id="finalCartTotal">0</span></h2>
+                        </div>
+                        <button class="payment-action-btn" onclick="submitOrderRound()">
+                            <span>注文を送信する (Place Order)</span> <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="productDetailModal" class="product-detail-modal">
+        <div class="product-detail-sheet" style="display: flex; flex-direction: column; max-height: 90vh; padding: 0; overflow: hidden; background: white;">
+            <button class="detail-close-btn" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.5); color: white; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; z-index: 10;" onclick="closeProductDetailModal()">&times;</button>
+            <div style="overflow-y: auto; flex-grow: 1;">
+                <div id="detailProductImage" style="height: 240px; flex-shrink: 0; background: #f1f5f9; position: relative;"></div>
+                <div class="detail-product-body" style="padding: 24px;">
+                    <div class="detail-product-heading" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <div>
+                            <h2 id="detailProductName" style="font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;"></h2>
+                            <p id="detailProductDescription" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.4;"></p>
+                        </div>
+                        <strong style="font-size: 1.4rem; color: var(--primary-text);">¥<span id="detailBasePrice">0</span></strong>
+                    </div>
+                    <div class="detail-section" style="margin-bottom: 24px;">
+                        <h3 style="font-size: 1.05rem; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">Toppings</h3>
+                        <div id="detailToppingOptions" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 16px 24px; background: white; border-top: 1px solid #e2e8f0; flex-shrink: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.02);">
+                <div class="detail-order-bar" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; background: #f8fafc; padding: 12px 16px; border-radius: 12px;">
+                    <div class="detail-quantity-control" style="display: flex; align-items: center; gap: 12px;">
+                        <button type="button" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer;" onclick="changeDetailQuantity(-1)">−</button>
+                        <input id="detailQuantity" type="number" min="1" value="1" readonly style="width: 40px; text-align: center; border: none; background: transparent; font-size: 1.2rem; font-weight: bold; font-family: var(--font-main);">
+                        <button type="button" style="width: 36px; height: 36px; border-radius: 50%; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer;" onclick="changeDetailQuantity(1)">+</button>
+                    </div>
+                    <div class="detail-price-summary" style="text-align: right;">
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Each: ¥<span id="detailUnitPrice">0</span></div>
+                        <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-dark);">Total: ¥<span id="detailTotalPrice">0</span></div>
+                    </div>
+                </div>
+                <button type="button" class="detail-add-cart-btn" onclick="addDetailProductToCart()">
+                    <i class="fa-solid fa-cart-plus"></i> カートに追加 (Add to Cart)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="orderVideoModal" class="bill-modal" style="z-index: 1050;">
+        <div class="bill-modal-content" style="padding: 0; overflow: hidden; max-width: 420px; text-align: center;">
+            <div style="width: 100%; height: 260px; background: #0F172A; position: relative;">
+                <video id="orderPrepVideo" muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+                    <!-- Connected to upload folder -->
+                    <source src="uploads/create_a_short_anime_style_vid.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div id="orderVideoText" style="padding: 24px; opacity: 0; transition: opacity 0.6s ease; display: flex; flex-direction: column; gap: 6px;">
+                <h3 style="color: var(--primary-text); font-size: 1.3rem; margin-bottom: 4px;">ご注文を受け付けました</h3>
+                <p style="color: var(--text-muted); font-size: 1.05rem; font-weight: 600;">調理を開始しました</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">少々お待ちください (Please wait a moment)</p>
+                <button class="payment-action-btn" onclick="proceedToBillFromVideo()">
+                    <i class="fa-solid fa-receipt"></i> 伝票を確認する (View Bill)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalReceiptModal" class="bill-modal">
+        <div class="bill-modal-content">
+            <div class="bill-header" style="justify-content: center;">
+                <!-- Connected to upload folder -->
+                <img src="uploads/mainlogo.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain;">
+            </div>
+            <h2 style="text-align: center; margin-bottom: 16px;">お会計（領収書）</h2>
+            <div class="bill-details">
+                <p><strong>注文番号:</strong> <span id="frBillId"></span></p>
+                <p><strong>ご利用方法:</strong> <span id="frType"></span></p>
+                <p><strong>席番号:</strong> <span id="frSeat"></span></p>
+                <div id="frItemsList" style="margin: 12px 0; padding: 8px 0; border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; font-size: 0.9rem;"></div>
+                <p style="font-size: 1.25rem; margin-top: 10px;">
+                    <strong>合計金額:</strong> <strong style="color: var(--primary-text);">¥<span id="frTotal"></span></strong>
+                </p>
+            </div>
+            <div class="bill-message" style="background: #ffffff; border: 1px solid var(--border-soft); padding: 12px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px;">
+                <p>「出来上がりまで少々お待ちください。ご注文の品ができ次第お持ちいたします。」</p>
+            </div>
+            <button class="payment-action-btn" onclick="clearSessionAndReload()">新しい注文へ (Close)</button>
+        </div>
+    </div>
+
+    <div id="securityGateModal" class="bill-modal" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
+        <div class="bill-modal-content" style="margin: auto; max-width: 360px;">
+            <div class="bill-header">
+                <h2>🔑 Manager Access</h2>
+                <button class="close-btn" onclick="document.getElementById('securityGateModal').style.display = 'none'">&times;</button>
+            </div>
+            <input type="password" id="gatePasscodeInput" maxlength="4" placeholder="••••" style="-webkit-text-security: disc; font-size: 2rem; text-align: center; padding: 12px; width: 100%; border-radius: 14px; border: 1px solid var(--border-soft); outline: none;">
+            <button class="payment-action-btn" style="margin-top: 12px;" onclick="verifyManagerCode()">Authenticate</button>
+        </div>
+    </div>
+</body>
+</html>
