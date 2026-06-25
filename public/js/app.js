@@ -3,6 +3,7 @@ let globalHistoricalItems = [];
 let currentProducts = [];
 let activeProduct = null;
 let assignedAutoSeat = null;
+const API_BASE_URL = 'http://localhost:8081';
 
 const commonToppings = [
     { id: '練乳シロップ', name: '練乳シロップ', price: 100 },
@@ -39,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function fetchSiteSettings() {
     const bannerEl = document.getElementById('dynamicPromoBannerText');
-    if(bannerEl) bannerEl.textContent = "Welcome to Hana Koori!";
+    if (bannerEl) bannerEl.textContent = "Welcome to Hana Koori!";
 }
 
 // Optimized Parallax Effect
@@ -78,7 +79,8 @@ function checkLiveSeatAvailability() {
     }
 
     if (seatRow) seatRow.style.display = "block";
-    assignedAutoSeat = 1; // Defaulting local simulation seat identifier
+    
+    assignedAutoSeat = 1; 
     if (statusBox) {
         statusBox.innerHTML = `<i class="fa-solid fa-location-dot"></i> テーブル ${assignedAutoSeat}`;
         statusBox.style.color = "var(--secondary-color)";
@@ -91,7 +93,7 @@ function checkLiveSeatAvailability() {
 function toggleSeatSelect() { checkLiveSeatAvailability(); }
 
 function fetchProducts() {
-    fetch('http://localhost:8081/api/products')
+    fetch(`${API_BASE_URL}/api/products`)
         .then(res => res.json())
         .then(data => { 
             currentProducts = data; 
@@ -226,8 +228,7 @@ function addDetailProductToCart() {
         quantity: qty
     };
 
-    // Forward cart item registration to Go backend API instance
-    fetch('http://localhost:8081/api/cart', { 
+    fetch(`${API_BASE_URL}/api/cart`, { 
         method: 'POST', 
         headers: { 'Content-Type': 'application/json' }, 
         body: JSON.stringify(payload) 
@@ -311,7 +312,7 @@ function dropItem(id) {
     const targetItem = cart.find(i => i.cart_id === id);
     if (!targetItem) return;
 
-    fetch(`http://localhost:8081/api/cart/${targetItem.menu_id}`, {
+    fetch(`${API_BASE_URL}/api/cart/${targetItem.menu_id}`, {
         method: 'DELETE'
     })
     .then(res => {
@@ -337,7 +338,7 @@ function submitOrderRound() {
     globalHistoricalItems = [...cart];
     localStorage.setItem('kakigori_history', JSON.stringify(globalHistoricalItems));
     
-    fetch('http://localhost:8081/api/cart/clear', {
+    fetch(`${API_BASE_URL}/api/cart/clear`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     })

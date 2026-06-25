@@ -1,31 +1,42 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
 	"hanakori2/internal/application/product"
+
 	"hanakori2/internal/infrastructure/database/repository"
+
 	"hanakori2/internal/presentation/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	port := os.Getenv("PORT")
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Warning: No .env file found, defaulting to system environment variables")
+	}
+
+	port := os.Getenv("BACKEND_PORT")
 	if port == "" {
-		port = "8081"
+		log.Fatal("CRITICAL CONFIGURATION ERROR: The 'BACKEND_PORT' variable is not defined.")
 	}
 
 	productRepo := repository.NewMySQLProductRepository()
 
-	getUseCase := product.NewGetProductUseCase(productRepo)
-	cartUseCase := product.NewCartUseCase(productRepo)
+	getProductsUC := product.NewGetProductUseCase(productRepo)
+	cartUC := product.NewCartUseCase(productRepo)
 
-	productHandler := http.NewProductHandler(getUseCase, cartUseCase)
+	handler := http.NewProductHandler(getProductsUC, cartUC)
+	router := http.SetupRouter(handler)
 
-	r := http.SetupRouter(productHandler)
+	serverAddress := fmt.Sprintf(":%s", port)
+	log.Printf("Server smoothly launched on environment address %s", serverAddress)
 
-	log.Printf("Server starting on port %s...", port)
-	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	if err := router.Run(serverAddress); err != nil {
+		log.Fatalf("Failed to run backend engine: %v", err)
 	}
 }
