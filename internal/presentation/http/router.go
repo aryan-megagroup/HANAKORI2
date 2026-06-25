@@ -1,17 +1,48 @@
 package http
 
 import (
-	"net/http"
+	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *http.ServeMux {
-	mux := http.NewServeMux()
+func SetupRouter(handler *ProductHandler) *gin.Engine {
+	r := gin.Default()
 
-	fileServer := http.FileServer(http.Dir("./public"))
-	mux.Handle("/", fileServer)
+	r.Use(func(c *gin.Context) {
+		allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
+		if allowedOrigin == "" {
+			allowedOrigin = "*"
+		}
 
-	productHandler := NewProductHandler()
-	mux.HandleFunc("/api/products", productHandler.GetSampleProducts)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-	return mux
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(200)
+			return
+		}
+		c.Next()
+	})
+
+	r.Static("/css", "./public/css")
+	r.Static("/js", "./public/js")
+	r.Static("/uploads", "./public/uploads")
+	r.StaticFile("/manager-script.js", "./public/manager-script.js")
+	r.StaticFile("/manager-style.css", "./public/manager-style.css")
+	r.StaticFile("/", "./public/index.html")
+	r.StaticFile("/manager", "./public/manager.html")
+
+	apiGroup := r.Group("/api")
+	{
+		apiGroup.GET("/products", handler.HandleGetProducts)
+		apiGroup.GET("/products/:id", handler.HandleGetProductByID)
+		apiGroup.GET("/cart", handler.HandleGetCart)
+		apiGroup.POST("/cart", handler.HandleAddToCart)
+		apiGroup.POST("/cart/clear", handler.HandleClearCart)
+		apiGroup.DELETE("/cart/:id", handler.HandleRemoveFromCart)
+	}
+
+	return r
 }

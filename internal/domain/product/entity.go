@@ -1,9 +1,18 @@
 package product
 
 type Product struct {
-	MenuID      int    `json:"menu_id"`
-	Name        string `json:"name"`
-	Price       int    `json:"price"`
-	Category    string `json:"category"`
-	IsAvailable bool   `json:"is_available"`
+	MenuID      int    `json:"MenuID"`
+	Name        string `json:"Name"`
+	Price       int    `json:"Price"`
+	Category    string `json:"Category"`
+	IsAvailable bool   `json:"IsAvailable"`
+}
+
+type CartItem struct {
+	Product  Product `json:"Product"`
+	Quantity int     `json:"Quantity"`
+}
+
+type SiteSettings struct {
+	PromoBanner string `json:"promo_banner"`
 }
