@@ -308,9 +308,25 @@ function updateCartUI() {
 }
 
 function dropItem(id) {
-    cart = cart.filter(i => i.cart_id !== id);
-    updateCartUI();
-    localStorage.setItem('kakigori_cart', JSON.stringify(cart));
+    const targetItem = cart.find(i => i.cart_id === id);
+    if (!targetItem) return;
+
+    fetch(`http://localhost:8081/api/cart/${targetItem.menu_id}`, {
+        method: 'DELETE'
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Failed to remove item from server");
+        return res.json();
+    })
+    .then(updatedCartBackend => {
+        cart = cart.filter(i => i.cart_id !== id);
+        updateCartUI();
+        localStorage.setItem('kakigori_cart', JSON.stringify(cart));
+        showToast("アイテムを削除しました", "success");
+    })
+    .catch(() => {
+        showToast("Failed to remove item from server session", "error");
+    });
 }
 
 function submitOrderRound() {
@@ -321,11 +337,20 @@ function submitOrderRound() {
     globalHistoricalItems = [...cart];
     localStorage.setItem('kakigori_history', JSON.stringify(globalHistoricalItems));
     
-    cart = [];
-    localStorage.removeItem('kakigori_cart');
-    updateCartUI();
-    
-    showOrderVideoModal();
+    fetch('http://localhost:8081/api/cart/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(() => {
+        cart = [];
+        localStorage.removeItem('kakigori_cart');
+        updateCartUI();
+        
+        showOrderVideoModal();
+    })
+    .catch(() => {
+        showToast("Failed to sync clear action with the server backend", "error");
+    });
 }
 
 function showOrderVideoModal() {

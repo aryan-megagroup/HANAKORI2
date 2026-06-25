@@ -6,48 +6,40 @@ import (
 )
 
 type CartUseCase struct {
-	repo  product.ProductRepository
-	items []product.CartItem // Simple in-memory storage for checkout simulation
+	repo product.ProductRepository
 }
 
 func NewCartUseCase(repo product.ProductRepository) *CartUseCase {
 	return &CartUseCase{
-		repo:  repo,
-		items: []product.CartItem{},
+		repo: repo,
 	}
 }
 
-func (uc *CartUseCase) GetCartItems() []product.CartItem {
-	return uc.items
-}
+func (uc *CartUseCase) AddToCart(currentCart []product.CartItem, productID int, qty int) ([]product.CartItem, error) {
+	if qty <= 0 {
+		return nil, errors.New("quantity must be positive")
+	}
 
-func (uc *CartUseCase) AddToCart(productID int, qty int) ([]product.CartItem, error) {
-	products, err := uc.repo.GetAllAvailable()
+	targetProduct, err := uc.repo.GetByID(productID)
 	if err != nil {
 		return nil, err
 	}
 
-	var targetProduct product.Product
-	found := false
-	for _, p := range products {
-		if p.MenuID == productID {
-			targetProduct = p
-			found = true
-			break
-		}
+	if !targetProduct.IsAvailable {
+		return nil, errors.New("product is currently sold out")
 	}
 
-	if !found {
-		return nil, errors.New("product not found to add to cart")
-	}
-
-	for i, item := range uc.items {
+	for i, item := range currentCart {
 		if item.Product.MenuID == productID {
-			uc.items[i].Quantity += qty
-			return uc.items, nil
+			currentCart[i].Quantity += qty
+			return currentCart, nil
 		}
 	}
 
-	uc.items = append(uc.items, product.CartItem{Product: targetProduct, Quantity: qty})
-	return uc.items, nil
+	updatedCart := append(currentCart, product.CartItem{
+		Product:  targetProduct,
+		Quantity: qty,
+	})
+
+	return updatedCart, nil
 }

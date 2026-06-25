@@ -1,6 +1,9 @@
 package repository
 
-import "hanakori2/internal/domain/product"
+import (
+	"errors"
+	"hanakori2/internal/domain/product"
+)
 
 type MySQLProductRepository struct{}
 
@@ -14,4 +17,15 @@ func (r *MySQLProductRepository) GetAllAvailable() ([]product.Product, error) {
 		{MenuID: 2, Name: "Chocolate Kakigori", Price: 550, Category: "kakigori", IsAvailable: true},
 		{MenuID: 3, Name: "Sakura Mochi Cake", Price: 480, Category: "snacks", IsAvailable: true},
 	}, nil
+}
+
+// 追加：IDで直接商品を検索して返す（将来的にSQLの WHERE menu_id = ? になる部分）
+func (r *MySQLProductRepository) GetByID(id int) (product.Product, error) {
+	products, _ := r.GetAllAvailable()
+	for _, p := range products {
+		if p.MenuID == id {
+			return p, nil
+		}
+	}
+	return product.Product{}, errors.New("product not found")
 }
