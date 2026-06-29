@@ -40,10 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function fetchSiteSettings() {
     const bannerEl = document.getElementById('dynamicPromoBannerText');
-    if (bannerEl) bannerEl.textContent = "Welcome to Hana Koori!";
+    if (bannerEl) {
+        const customText = localStorage.getItem('custom_promo_banner_text');
+        bannerEl.textContent = customText || "Welcome to Hana Koori!";
+    }
 }
 
-// Optimized Parallax Effect
 window.addEventListener('scroll', () => {
     window.requestAnimationFrame(() => {
         document.querySelectorAll('.product-item-card').forEach(card => {
@@ -79,15 +81,36 @@ function checkLiveSeatAvailability() {
     }
 
     if (seatRow) seatRow.style.display = "block";
-    
-    assignedAutoSeat = 1; 
-    if (statusBox) {
-        statusBox.innerHTML = `<i class="fa-solid fa-location-dot"></i> テーブル ${assignedAutoSeat}`;
-        statusBox.style.color = "var(--secondary-color)";
-        statusBox.style.background = "rgba(124, 179, 66, 0.1)";
-        statusBox.style.borderColor = "rgba(124, 179, 66, 0.3)";
-    }
-    if (checkoutBtn) checkoutBtn.disabled = false;
+
+    fetch(`${API_BASE_URL}/api/get_orders`)
+        .then(res => res.json())
+        .then(data => {
+            const orders = data.orders || [];
+            
+            const occupiedTables = orders
+                .filter(o => o.status === "pending" || o.status === "making")
+                .map(o => parseInt(o.seat_number));
+
+            let candidateSeat = 1;
+            while (occupiedTables.includes(candidateSeat)) {
+                candidateSeat++; 
+            }
+
+            assignedAutoSeat = candidateSeat;
+            localStorage.setItem('kakigori_assigned_seat', assignedAutoSeat);
+
+            if (statusBox) {
+                statusBox.innerHTML = `<i class="fa-solid fa-chair"></i> テーブル ${assignedAutoSeat} (Auto Assigned)`;
+                statusBox.style.color = "var(--secondary-color)";
+                statusBox.style.background = "rgba(124, 179, 66, 0.1)";
+                statusBox.style.borderColor = "rgba(124, 179, 66, 0.3)";
+            }
+            if (checkoutBtn) checkoutBtn.disabled = false;
+        })
+        .catch(() => {
+            assignedAutoSeat = 1;
+            if (statusBox) statusBox.innerHTML = `<i class="fa-solid fa-location-dot"></i> テーブル 1`;
+        });
 }
 
 function toggleSeatSelect() { checkLiveSeatAvailability(); }
@@ -110,7 +133,6 @@ function filterMenu(category, btnElement) {
     
     let filtered = currentProducts;
     if (category !== 'All') { 
-        // Handles 'Ice' -> 'kakigori' and 'Snack' -> 'snacks' matching
         filtered = currentProducts.filter(p => {
             const cat = p.Category.toLowerCase();
             if (category === 'Ice') return cat === 'ice' || cat === 'kakigori';
@@ -142,22 +164,27 @@ function loadResponsiveMenu(dataToDisplay = currentProducts) {
     }
 
     dataToDisplay.forEach((item, index) => {
-        const isAvailable = item.IsAvailable === true;
+        const isAvailable = item.IsAvailable === true || item.IsAvailable === 1;
+        
         const card = document.createElement("button");
         card.className = `product-item-card${isAvailable ? '' : ' unavailable'}`;
-        card.disabled = !isAvailable;
+        card.disabled = !isAvailable; 
         card.style.animationDelay = `${index * 0.05}s`; 
         card.onclick = () => openProductDetail(item.MenuID); 
 
         card.innerHTML = `
             <div class="item-image-placeholder">
-                <i class="fa-solid fa-image" style="font-size:3rem; color:#cbd5e1;"></i>
+                ${item.ImageURL 
+                    ? `<img src="${API_BASE_URL}/${item.ImageURL}" style="width:100%; height:100%; object-fit:cover;"onerror="this.onerror=null; this.style.display='none';">` 
+                    : `<i class="fa-solid fa-image" style="font-size:3rem; color:#cbd5e1;"></i>`}
             </div>
             <div class="product-info">
                 <h4>${escapeHtml(item.Name)}</h4> 
                 <p class="price">¥${item.Price}</p> 
             </div>
-            <span class="view-product-btn">${isAvailable ? '注文・カスタマイズ (Order / Customize)' : '売切 (Sold Out)'}</span>
+            <span class="view-product-btn" style="${!isAvailable ? 'background: #64748b; color: white;' : ''}">
+                ${isAvailable ? '注文・カスタマイズ (Order / Customize)' : '売切 (Sold Out)'}
+            </span>
         `;
         container.appendChild(card);
     });
@@ -235,7 +262,6 @@ function addDetailProductToCart() {
     })
     .then(res => res.json())
     .then(updatedCartBackend => {
-        // Map Go nested structs to standard frontend structural loop tracking
         cart = updatedCartBackend.map(item => ({
             cart_id: `${item.Product.MenuID}-${Date.now()}`,
             menu_id: item.Product.MenuID,
@@ -335,12 +361,32 @@ function submitOrderRound() {
     const orderType = document.getElementById("orderType").value;
     if (orderType === "Eat-in" && assignedAutoSeat === null) { showToast('席を確認できません (No seat assigned)', 'error'); return; }
     
-    globalHistoricalItems = [...cart];
-    localStorage.setItem('kakigori_history', JSON.stringify(globalHistoricalItems));
+    const subtotal = cart.reduce((s, i) => s + (i.price * i.quantity), 0);
     
-    fetch(`${API_BASE_URL}/api/cart/clear`, {
+    const orderPayload = {
+        order_code: `TX-${Date.now().toString().slice(-6)}`,
+        order_type: orderType,
+        seat_number: assignedAutoSeat ? parseInt(assignedAutoSeat) : 0,
+        total_price: subtotal,
+        status: "pending",
+        items: cart.map(i => ({
+            name: i.name,
+            price: i.price,
+            quantity: i.quantity
+        }))
+    };
+
+    fetch(`${API_BASE_URL}/api/submit_order`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+    })
+    .then(res => res.json())
+    .then(() => {
+        globalHistoricalItems = [...cart];
+        localStorage.setItem('kakigori_history', JSON.stringify(globalHistoricalItems));
+        
+        return fetch(`${API_BASE_URL}/api/cart/clear`, { method: 'POST' });
     })
     .then(() => {
         cart = [];
@@ -350,7 +396,7 @@ function submitOrderRound() {
         showOrderVideoModal();
     })
     .catch(() => {
-        showToast("Failed to sync clear action with the server backend", "error");
+        showToast("Failed to clear and sync order state with server backend", "error");
     });
 }
 
@@ -413,20 +459,53 @@ function togglePromoInputRow() {
 }
 
 function applyCheckoutPromoCode() {
-    const code = document.getElementById('checkoutPromoCode').value.trim();
-    if (!code) return;
-    
-    localStorage.removeItem('active_co_promo');
-    document.getElementById('checkoutPromoMessage').textContent = `✓ Active Discount Checked`;
-    showToast('プロモーションを適用しました！', 'success');
-    recalculateCheckoutInvoice();
+    const codeInput = document.getElementById('checkoutPromoCode').value.trim().toUpperCase();
+    if (!codeInput) return;
+
+    fetch(`${API_BASE_URL}/api/get_promos`)
+        .then(res => res.json())
+        .then(promos => {
+            const matchedPromo = promos.find(p => p.code.toUpperCase() === codeInput && p.is_active);
+
+            if (!matchedPromo) {
+                localStorage.removeItem('active_co_promo');
+                document.getElementById('checkoutPromoMessage').textContent = "❌ 無効なコードです (Invalid code)";
+                document.getElementById('checkoutPromoMessage').style.color = "var(--danger)";
+                showToast("Invalid or inactive promo code", "error");
+                recalculateCheckoutInvoice();
+                return;
+            }
+
+            localStorage.setItem('active_co_promo', JSON.stringify(matchedPromo));
+            document.getElementById('checkoutPromoMessage').textContent = `✓ ${matchedPromo.code} (${matchedPromo.discount_value}${matchedPromo.discount_type === 'percentage' ? '%' : '¥'} OFF) 適用中`;
+            document.getElementById('checkoutPromoMessage').style.color = "var(--secondary-color)";
+            showToast('プロモーションを適用しました！', 'success');
+            recalculateCheckoutInvoice();
+        })
+        .catch(() => showToast("Failed to validate promo code with server", "error"));
 }
+
+
 
 function recalculateCheckoutInvoice() {
     const subtotal = globalHistoricalItems.reduce((s, i) => s + (i.price * i.quantity), 0);
+    let discount = 0;
+
+    const savedPromo = localStorage.getItem('active_co_promo');
+    if (savedPromo) {
+        const promo = JSON.parse(savedPromo);
+        if (promo.discount_type === 'percentage') {
+            discount = Math.round(subtotal * (promo.discount_value / 100));
+        } else {
+            discount = promo.discount_value;
+        }
+    }
+
+    const grandTotal = Math.max(0, subtotal - discount);
+
     document.getElementById('coSubtotal').textContent = subtotal;
-    document.getElementById('coDiscount').textContent = 0;
-    document.getElementById('coGrandTotal').textContent = subtotal;
+    document.getElementById('coDiscount').textContent = discount;
+    document.getElementById('coGrandTotal').textContent = grandTotal;
 }
 
 function finalizeCheckoutSession() {
