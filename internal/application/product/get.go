@@ -1,7 +1,6 @@
 package product
 
 import (
-	"errors"
 	"hanakori2/internal/domain/product"
 )
 
@@ -33,15 +32,5 @@ func (uc *GetProductUseCase) Execute(category string) ([]product.Product, error)
 }
 
 func (uc *GetProductUseCase) GetByID(id int) (product.Product, error) {
-	products, err := uc.repo.GetAllAvailable()
-	if err != nil {
-		return product.Product{}, err
-	}
-
-	for _, p := range products {
-		if p.MenuID == id {
-			return p, nil
-		}
-	}
-	return product.Product{}, errors.New("product not found")
+	return uc.repo.GetByID(id)
 }

@@ -29,10 +29,10 @@ func SetupRouter(handler *ProductHandler) *gin.Engine {
 	r.Static("/css", "./public/css")
 	r.Static("/js", "./public/js")
 	r.Static("/uploads", "./public/uploads")
-	r.StaticFile("/manager-script.js", "./public/manager-script.js")
+	r.StaticFile("/manager-script.js", "./public/js/manager-scrip.js")
 	r.StaticFile("/manager-style.css", "./public/manager-style.css")
 	r.StaticFile("/", "./public/index.html")
-	r.StaticFile("/manager", "./public/manager.html")
+	r.StaticFile("/manager.html", "./public/manager.html")
 
 	apiGroup := r.Group("/api")
 	{
@@ -42,6 +42,15 @@ func SetupRouter(handler *ProductHandler) *gin.Engine {
 		apiGroup.POST("/cart", handler.HandleAddToCart)
 		apiGroup.POST("/cart/clear", handler.HandleClearCart)
 		apiGroup.DELETE("/cart/:id", handler.HandleRemoveFromCart)
+
+		apiGroup.POST("/manage_products", handler.HandleManageProduct)
+
+		apiGroup.GET("/get_promos", handler.HandleGetAllPromos)
+		apiGroup.POST("/manage_promos", handler.HandleManagePromo)
+
+		apiGroup.GET("/get_orders", handler.HandleGetOrders)
+		apiGroup.POST("/update_order_status", handler.HandleUpdateOrderStatus)
+		apiGroup.POST("/submit_order", handler.HandleSubmitOrderLine)
 	}
 
 	return r

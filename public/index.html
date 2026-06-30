@@ -6,12 +6,22 @@
     <title>華こおり - Shaved Ice Ordering Panel</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                e.target.onerror = null; 
+                e.target.src = '';       
+                e.target.style.display = 'none'; 
+            }
+        }, true);
+    </script>
+
     <script src="js/app.js"></script>
 </head>
 <body>
     <div class="video-bg-container">
         <video autoplay muted loop playsinline id="bg-video">
-            <!-- Connected to upload folder -->
             <source src="uploads/I_want_you_to_create_a_animate.mp4" type="video/mp4">
         </video>
         <div class="video-overlay"></div>s
@@ -22,7 +32,6 @@
     <div class="responsive-app-wrapper">
         <aside class="sidebar-nav"> 
             <div class="brand">
-                <!-- Connected to upload folder -->
                 <img src="uploads/mainlogo.png" alt="華こおり" class="brand-logo" style="width: 44px; height: 44px; object-fit: contain; border-radius: 8px;">
                 <h2>華こおり</h2>
             </div>
@@ -206,7 +215,6 @@
     <div id="finalReceiptModal" class="bill-modal">
         <div class="bill-modal-content">
             <div class="bill-header" style="justify-content: center;">
-                <!-- Connected to upload folder -->
                 <img src="uploads/mainlogo.png" alt="Logo" style="width: 50px; height: 50px; object-fit: contain;">
             </div>
             <h2 style="text-align: center; margin-bottom: 16px;">お会計（領収書）</h2>
