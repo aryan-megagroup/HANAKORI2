@@ -166,6 +166,16 @@ func (h *ProductHandler) HandleManageProduct(c *gin.Context) {
 
 	file, err := c.FormFile("image")
 	if err == nil {
+		ext := filepath.Ext(file.Filename)
+
+		if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".JPG" && ext != ".JPEG" && ext != ".PNG" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"success": false,
+				"message": "Invalid file type. Please upload only JPG or PNG image files.",
+			})
+			return
+		}
+
 		filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filepath.Base(file.Filename))
 		savePath := filepath.Join("./public/uploads", filename)
 
