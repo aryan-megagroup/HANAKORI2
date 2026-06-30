@@ -260,7 +260,7 @@ function loadOrders() {
 
             if (document.getElementById('statsTotalEarnings')) { 
                 const earnings = data.total_earnings || 0;
-                document.getElementById('statsTotalEarnings').textContent = `¥${earnings.toLocaleString()}`; 
+                document.getElementById('statsTotalEarnings').textContent = `¥${earnings.toLocaleString('ja-JP')}`; 
             }
             const tbody = document.querySelector('#ordersTable tbody');
             if (!tbody) return;
