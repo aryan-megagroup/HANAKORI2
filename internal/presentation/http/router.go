@@ -1,57 +1,17 @@
 package http
 
 import (
-	"os"
-
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func SetupRouter(handler *ProductHandler) *gin.Engine {
-	r := gin.Default()
+func SetupRouter() *http.ServeMux {
+	mux := http.NewServeMux()
 
-	r.Use(func(c *gin.Context) {
-		allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
-		if allowedOrigin == "" {
-			allowedOrigin = "*"
-		}
+	fileServer := http.FileServer(http.Dir("./public"))
+	mux.Handle("/", fileServer)
 
-		c.Writer.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	productHandler := NewProductHandler()
+	mux.HandleFunc("/api/products", productHandler.GetSampleProducts)
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(200)
-			return
-		}
-		c.Next()
-	})
-
-	r.Static("/css", "./public/css")
-	r.Static("/js", "./public/js")
-	r.Static("/uploads", "./public/uploads")
-	r.StaticFile("/manager-script.js", "./public/js/manager-scrip.js")
-	r.StaticFile("/manager-style.css", "./public/manager-style.css")
-	r.StaticFile("/", "./public/index.html")
-	r.StaticFile("/manager.html", "./public/manager.html")
-
-	apiGroup := r.Group("/api")
-	{
-		apiGroup.GET("/products", handler.HandleGetProducts)
-		apiGroup.GET("/products/:id", handler.HandleGetProductByID)
-		apiGroup.GET("/cart", handler.HandleGetCart)
-		apiGroup.POST("/cart", handler.HandleAddToCart)
-		apiGroup.POST("/cart/clear", handler.HandleClearCart)
-		apiGroup.DELETE("/cart/:id", handler.HandleRemoveFromCart)
-
-		apiGroup.POST("/manage_products", handler.HandleManageProduct)
-
-		apiGroup.GET("/get_promos", handler.HandleGetAllPromos)
-		apiGroup.POST("/manage_promos", handler.HandleManagePromo)
-
-		apiGroup.GET("/get_orders", handler.HandleGetOrders)
-		apiGroup.POST("/update_order_status", handler.HandleUpdateOrderStatus)
-		apiGroup.POST("/submit_order", handler.HandleSubmitOrderLine)
-	}
-
-	return r
+	return mux
 }
