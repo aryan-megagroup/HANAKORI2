@@ -201,8 +201,11 @@ function openProductDetail(menuId) {
     document.getElementById('detailQuantity').value = 1;
     
     const imgEl = document.getElementById('detailProductImage');
-    imgEl.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;"><i class="fa-solid fa-image" style="font-size:4rem; color:#cbd5e1;"></i></div>`;
-
+    if (product.ImageURL) {
+        imgEl.innerHTML = `<img src="${API_BASE_URL}/${product.ImageURL}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null; this.innerHTML='<div style=\'width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;\'><i class=\'fa-solid fa-image\' style=\'font-size:4rem; color:#cbd5e1;\'></i></div>';">`;
+    } else {
+        imgEl.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;"><i class="fa-solid fa-image" style="font-size:4rem; color:#cbd5e1;"></i></div>`;
+    }
     const toppingContainer = document.getElementById('detailToppingOptions');
     const toppings = categoryToppings[product.Category] || commonToppings;
     
