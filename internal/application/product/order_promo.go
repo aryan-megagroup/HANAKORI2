@@ -9,10 +9,10 @@ import (
 type OrderPromoUseCase struct {
 	productRepo product.ProductRepository
 	promoRepo   promo.PromoRepository
-	orderRepo   order.OrderRepository
+	orderRepo   order.Repository
 }
 
-func NewOrderPromoUseCase(pRepo product.ProductRepository, prRepo promo.PromoRepository, oRepo order.OrderRepository) *OrderPromoUseCase {
+func NewOrderPromoUseCase(pRepo product.ProductRepository, prRepo promo.PromoRepository, oRepo order.Repository) *OrderPromoUseCase {
 	return &OrderPromoUseCase{
 		productRepo: pRepo,
 		promoRepo:   prRepo,

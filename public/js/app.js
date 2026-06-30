@@ -201,7 +201,24 @@ function openProductDetail(menuId) {
     document.getElementById('detailQuantity').value = 1;
     
     const imgEl = document.getElementById('detailProductImage');
-    imgEl.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;"><i class="fa-solid fa-image" style="font-size:4rem; color:#cbd5e1;"></i></div>`;
+    
+    imgEl.innerHTML = '';
+
+    if (product.ImageURL) {
+        const imgObj = document.createElement('img');
+        imgObj.src = `${API_BASE_URL}/${product.ImageURL}`;
+        imgObj.style.width = '100%';
+        imgObj.style.height = '100%';
+        imgObj.style.objectFit = 'cover';
+
+        imgObj.onerror = function() {
+            imgEl.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;"><i class="fa-solid fa-image" style="font-size:4rem; color:#cbd5e1;"></i></div>`;
+        };
+
+        imgEl.appendChild(imgObj);
+    } else {
+        imgEl.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9;"><i class="fa-solid fa-image" style="font-size:4rem; color:#cbd5e1;"></i></div>`;
+    }
 
     const toppingContainer = document.getElementById('detailToppingOptions');
     const toppings = categoryToppings[product.Category] || commonToppings;
