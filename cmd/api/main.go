@@ -44,11 +44,14 @@ func main() {
 	}
 
 	productRepo := repository.NewMySQLProductRepository(db)
+	promoRepo := repository.NewMySQLPromoRepository(db)
+	orderRepo := repository.NewMySQLOrderRepository(db)
 
 	getProductsUC := product.NewGetProductUseCase(productRepo)
 	cartUC := product.NewCartUseCase(productRepo)
+	orderPromoUC := product.NewOrderPromoUseCase(productRepo, promoRepo, orderRepo)
 
-	handler := http.NewProductHandler(getProductsUC, cartUC, db)
+	handler := http.NewProductHandler(getProductsUC, cartUC, orderPromoUC)
 	router := http.SetupRouter(handler)
 
 	serverAddress := fmt.Sprintf(":%s", port)

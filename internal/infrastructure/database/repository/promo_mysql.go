@@ -30,6 +30,10 @@ func (r *MySQLPromoRepository) GetAll() ([]promo.PromoCode, error) {
 		}
 		promos = append(promos, p)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return promos, nil
 }
 

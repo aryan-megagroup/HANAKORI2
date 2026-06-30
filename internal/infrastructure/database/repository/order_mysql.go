@@ -71,6 +71,10 @@ func (r *MySQLOrderRepository) GetAllOrders() ([]order.Order, error) {
 		}
 		orders = append(orders, o)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return orders, nil
 }
 

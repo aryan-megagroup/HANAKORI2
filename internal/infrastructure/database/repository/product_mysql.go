@@ -33,13 +33,39 @@ func (r *MySQLProductRepository) GetAll() ([]product.Product, error) {
 	defer rows.Close()
 
 	products := []product.Product{}
-
 	for rows.Next() {
 		var p product.Product
 		if err := rows.Scan(&p.MenuID, &p.Name, &p.Price, &p.Description, &p.Category, &p.ImageURL, &p.IsAvailable); err != nil {
 			return nil, err
 		}
 		products = append(products, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (r *MySQLProductRepository) GetAllAvailable() ([]product.Product, error) {
+	query := `SELECT menu_id, name, price, description, category, image_url, is_available FROM products ORDER BY menu_id DESC`
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []product.Product
+	for rows.Next() {
+		var p product.Product
+		if err := rows.Scan(&p.MenuID, &p.Name, &p.Price, &p.Description, &p.Category, &p.ImageURL, &p.IsAvailable); err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return products, nil
 }
@@ -67,24 +93,4 @@ func (r *MySQLProductRepository) Delete(id int) error {
 	query := `DELETE FROM products WHERE menu_id = ?`
 	_, err := r.db.Exec(query, id)
 	return err
-}
-
-func (r *MySQLProductRepository) GetAllAvailable() ([]product.Product, error) {
-	query := `SELECT menu_id, name, price, description, category, image_url, is_available FROM products ORDER BY menu_id DESC`
-	rows, err := r.db.Query(query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var products []product.Product
-
-	for rows.Next() {
-		var p product.Product
-		if err := rows.Scan(&p.MenuID, &p.Name, &p.Price, &p.Description, &p.Category, &p.ImageURL, &p.IsAvailable); err != nil {
-			return nil, err
-		}
-		products = append(products, p)
-	}
-	return products, nil
 }
