@@ -1,4 +1,3 @@
-const API_BASE_URL = 'http://localhost:8081';
 let currentEditingProductId = null;
 let currentEditingPromoId = null;
 let globalProductsCache = [];
@@ -9,8 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     loadPromos();
     loadOrders();
     setupImageUpload();
+    loadPromoBanner(); 
 });
 
+// Optimized Parallax Effect
 window.addEventListener('scroll', () => {
     window.requestAnimationFrame(() => {
         document.querySelectorAll('.product-item-card').forEach(card => {
@@ -70,63 +71,43 @@ function setupImageUpload() {
 }
 
 function loadProducts() {
-    fetch(`${API_BASE_URL}/api/products`)
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`Server returned status ${res.status}`);
-            }
-            return res.json();
-        })
+    fetch('api/get_products.php')
+        .then(res => res.json())
         .then(products => {
-            globalProductsCache = products || [];
-            
+            globalProductsCache = products;
             const tbody = document.querySelector('#productsTable tbody');
             if (!tbody) return;
-            
-            if (globalProductsCache.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#64748b;">No products found. Add your first item!</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = globalProductsCache.map(p => `
+            tbody.innerHTML = products.map(p => `
                 <tr>
-                <td><img src="${API_BASE_URL}/${p.ImageURL || 'uploads/no-image.png'}" class="product-img" style="width:50px; height:50px; object-fit:cover; border-radius:6px;" onerror="this.onerror=null; this.src='';"></td>
-                    <td><strong>${escapeHtml(p.Name || '')}</strong></td>
-                    <td>${escapeHtml(p.Category || '')}</td>
-                    <td>¥${p.Price || 0}</td>
-                    <td><span class="badge ${p.IsAvailable ? 'badge-success' : 'badge-danger'}">${p.IsAvailable ? 'Available' : 'No'}</span></td>
+                    <td><img src="${p.image_url}" class="product-img" style="width:50px; height:50px; object-fit:cover; border-radius:6px;" onerror="this.src='uploads/no-image.png'"></td>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.category}</td>
+                    <td>¥${p.price}</td>
+                    <td><span class="badge ${p.is_available ? 'badge-success' : 'badge-danger'}">${p.is_available ? 'Available' : 'No'}</span></td>
                     <td>
-                        <button class="action-btn action-btn-edit" onclick="editProduct(${p.MenuID})"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="action-btn action-btn-delete" onclick="deleteProduct(${p.MenuID})"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn action-btn-edit" onclick="editProduct(${p.menu_id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="action-btn action-btn-delete" onclick="deleteProduct(${p.menu_id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
-        })
-        .catch(err => {
-            console.error("Error loading products:", err);
-            const tbody = document.querySelector('#productsTable tbody');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Failed to connect to backend server.</td></tr>';
         });
 }
 
 function editProduct(menuId) {
-    const product = globalProductsCache.find(p => parseInt(p.MenuID) === parseInt(menuId));
+    const product = globalProductsCache.find(p => parseInt(p.menu_id) === parseInt(menuId));
     if (!product) return;
 
-    currentEditingProductId = product.MenuID; 
+    currentEditingProductId = product.menu_id;
     document.getElementById('formTitle').textContent = 'Edit Product';
     
-    document.getElementById('productName').value = product.Name; 
-    document.getElementById('productPrice').value = product.Price; 
-    document.getElementById('productDescription').value = product.Description || '';
-    document.getElementById('productCategory').value = product.Category || 'Ice'; 
-    document.getElementById('productAvailable').value = product.IsAvailable ? "1" : "0"; 
+    document.getElementById('productName').value = product.name;
+    document.getElementById('productPrice').value = product.price;
+    document.getElementById('productDescription').value = product.description || '';
+    document.getElementById('productCategory').value = product.category || 'Ice';
+    document.getElementById('productAvailable').value = product.is_available ? "1" : "0";
     
-    if (product.ImageURL) { 
-        document.getElementById('imagePreview').innerHTML = `<img src="${product.ImageURL}" style="max-width:100%; border-radius:8px; max-height:200px;">`; 
-    } else { 
-        document.getElementById('imagePreview').innerHTML = ''; 
-    }
+    if (product.image_url) { document.getElementById('imagePreview').innerHTML = `<img src="${product.image_url}" style="max-width:100%; border-radius:8px; max-height:200px;">`; } 
+    else { document.getElementById('imagePreview').innerHTML = ''; }
 
     document.getElementById('productFormContainer').style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -147,7 +128,7 @@ function submitProduct(e) {
     const fileInput = document.getElementById('productImage');
     if (fileInput.files.length > 0) { formData.append('image', fileInput.files[0]); }
 
-    fetch('http://localhost:8081/api/manage_products', { method: 'POST', body: formData })
+    fetch('api/manage_products.php', { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
         if (data.success) {
@@ -160,28 +141,18 @@ function submitProduct(e) {
 
 function deleteProduct(menuId) {
     if (!confirm('本当にこのアイテムを完全に削除しますか？')) return;
-    
-    const formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('menu_id', menuId);
-
-    fetch(`${API_BASE_URL}/api/manage_products`, {
+    fetch('api/manage_products.php', {
         method: 'POST',
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => { 
-        alert(data.message); 
-        loadProducts(); 
-    })
-    .catch(err => alert('Network error: ' + err));
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', menu_id: menuId })
+    }).then(res => res.json()).then(data => { alert(data.message); loadProducts(); });
 }
 
 function loadPromos() {
-    fetch(`${API_BASE_URL}/api/get_promos`)
+    fetch('api/get_promos.php')
         .then(res => res.json())
         .then(promos => {
-            globalPromosCache = promos || [];
+            globalPromosCache = promos;
             const tbody = document.querySelector('#promosTable tbody');
             if (!tbody) return;
             if (!promos || promos.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">プロモーションコードはありません。「追加」ボタンから作成してください。</td></tr>'; return; }
@@ -225,7 +196,7 @@ function submitPromo(e) {
         discount_value: parseInt(document.getElementById('promoDiscountValue').value),
         is_active: parseInt(document.getElementById('promoActive').value)
     };
-    fetch(`${API_BASE_URL}/api/manage_promos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    fetch('api/manage_promos.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
     .then(res => res.json())
     .then(data => {
         if (data.success) { alert(data.message); togglePromoForm(); loadPromos(); } 
@@ -235,7 +206,7 @@ function submitPromo(e) {
 
 function deletePromo(promoId) {
     if (!confirm('このプロモーションコードを削除しますか？')) return;
-    fetch(`${API_BASE_URL}/api/manage_promos`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', promo_id: promoId }) })
+    fetch('api/manage_promos.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', promo_id: promoId }) })
     .then(res => res.json()).then(data => { alert(data.message); loadPromos(); });
 }
 
@@ -248,19 +219,20 @@ function loadPromoBanner() {
 function submitPromoBanner(e) {
     e.preventDefault();
     const text = document.getElementById('promoBannerInput').value;
-    localStorage.setItem('custom_promo_banner_text', text);
-    alert('ユーザー画面の設定を更新しました！ (Store banner updated successfully)');
+    fetch('api/manage_settings.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ promo_banner: text }) })
+    .then(res => res.json())
+    .then(data => { alert(data.message); }).catch(err => alert('Network error: ' + err));
 }
 
 function loadOrders() {
-    fetch(`${API_BASE_URL}/api/get_orders`)
+    fetch('get_orders.php')
         .then(res => res.json())
         .then(data => {
+            // Save the fetched orders to your cache variable so the View button can use them
             globalOrdersCache = data.orders || []; 
 
             if (document.getElementById('statsTotalEarnings')) { 
-                const earnings = data.total_earnings || 0;
-                document.getElementById('statsTotalEarnings').textContent = `¥${earnings.toLocaleString()}`; 
+                document.getElementById('statsTotalEarnings').textContent = `¥${data.total_earnings.toLocaleString()}`; 
             }
             const tbody = document.querySelector('#ordersTable tbody');
             if (!tbody) return;
@@ -288,17 +260,19 @@ function loadOrders() {
 }
 
 function updateOrderStatus(orderId, newStatus) { 
-    fetch(`${API_BASE_URL}/api/update_order_status`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: orderId, status: newStatus }) })
+    fetch('api/update_order_status.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ order_id: orderId, status: newStatus }) })
     .then(res => res.json()).then(data => { if (data.success) { loadOrders(); } }); 
 }
 
 function viewOrderDetails(orderId) {
+    // 1. Find the specific order from the cache
     const order = globalOrdersCache.find(o => parseInt(o.order_id) === parseInt(orderId));
     if (!order) {
         alert('注文データが見つかりません。');
         return;
     }
 
+    // 2. Populate the Meta Information (Header of the modal)
     document.getElementById('orderDetailTitle').textContent = order.order_code || order.order_id;
     
     document.getElementById('orderDetailMeta').innerHTML = `
@@ -310,18 +284,23 @@ function viewOrderDetails(orderId) {
         </div>
     `;
 
+    // 3. Open the Modal
     document.getElementById('orderDetailModal').style.display = 'block';
     const itemsContainer = document.getElementById('orderDetailItems');
 
+    // 4. Render Items
     if (order.items && Array.isArray(order.items)) {
+        // If your get_orders.php already includes the items array
         renderOrderItemsList(order.items, itemsContainer);
     } else {
+        // Fallback: Fetch items dynamically if they aren't in the initial cache
         itemsContainer.innerHTML = '<p style="color: #64748b; text-align: center;"><i class="fas fa-spinner fa-spin"></i> 読み込み中...</p>';
         
         fetch(`api/get_order_details.php?order_id=${orderId}`)
             .then(res => res.json())
             .then(data => {
                 if (data.items && data.items.length > 0) {
+                    // Update cache for next time
                     order.items = data.items;
                     renderOrderItemsList(data.items, itemsContainer);
                 } else {
@@ -334,8 +313,10 @@ function viewOrderDetails(orderId) {
     }
 }
 
+// Helper function to build the HTML for the ordered items list
 function renderOrderItemsList(items, container) {
     container.innerHTML = items.map(i => {
+        // Fallback safety shield: use i.price. If it's missing, use i.unit_price
         const actualPrice = i.price !== undefined ? i.price : i.unit_price;
         
         return `
@@ -353,9 +334,4 @@ function renderOrderItemsList(items, container) {
 function closeOrderDetailModal() { 
     document.getElementById('orderDetailModal').style.display = 'none'; 
 }
-
 function closeOrderDetailModal() { document.getElementById('orderDetailModal').style.display = 'none'; }
-
-function escapeHtml(v) { 
-    return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); 
-}
