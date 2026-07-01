@@ -1,0 +1,27 @@
+{
+    "common": {
+        "home": "Home",
+        "manager": "Manager",
+        "save": "Save",
+        "cancel": "Cancel"
+    },
+    "customer": {
+        "greeting": "Hello 👋",
+        "subgreeting": "Please choose your favorite Shaved Ice",
+        "search_placeholder": "Search menu...",
+        "special_treats": "SPECIAL TREATS 🍧",
+        "cart_title": "Shopping Cart",
+        "cart_empty": "Your cart is empty",
+        "order_customize": "Order / Customize"
+    },
+    "manager": {
+        "dashboard_title": "Manager Dashboard",
+        "total_earnings": "Total Earnings (Completed Orders)",
+        "products_mgmt": "Products Management",
+        "add_product": "Add New Product",
+        "product_name": "Product Name *",
+        "price": "Price (¥) *",
+        "category": "Category *",
+        "available": "Available"
+    }
+}
