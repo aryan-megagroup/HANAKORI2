@@ -359,3 +359,27 @@ function closeOrderDetailModal() { document.getElementById('orderDetailModal').s
 function escapeHtml(v) { 
     return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); 
 }
+function toggleAdminSidebar() {
+    const container = document.querySelector('.manager-container');
+    if (window.innerWidth <= 768) {
+        container.classList.toggle('sidebar-open');
+        container.classList.remove('sidebar-closed');
+    } else {
+        container.classList.toggle('sidebar-closed');
+        container.classList.remove('sidebar-open');
+    }
+}
+function switchTab(t) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.sidebar-menu .menu-item').forEach(i => i.classList.remove('active'));
+    document.getElementById(t).classList.add('active');
+
+    if (window.event && window.event.target) {
+        window.event.target.closest('.menu-item').classList.add('active');
+    }
+
+    const container = document.querySelector('.manager-container');
+    if (container && window.innerWidth <= 768) {
+        container.classList.remove('sidebar-open');
+    }
+}
