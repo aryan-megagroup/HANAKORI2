@@ -564,5 +564,38 @@ function verifyManagerCode() {
     if (document.getElementById('gatePasscodeInput').value === "0000") { window.location.href = "manager.html"; } 
     else { showToast("Passcode incorrect", "error"); }
 }
+function toggleSidebar() {
+    const wrapper = document.querySelector('.responsive-app-wrapper');
+    if (window.innerWidth <= 768) {
+        wrapper.classList.toggle('sidebar-open');
+        wrapper.classList.remove('sidebar-closed');
+    } else {
+        wrapper.classList.toggle('sidebar-closed');
+        wrapper.classList.remove('sidebar-open');
+    }
+}
+function returnToMenuScreen() {
+    document.getElementById('checkoutWorkspaceArea').style.display = 'none';
+    document.getElementById('menuWorkspaceArea').style.display = 'flex';
+    document.getElementById('sidebarControlWorkspace').style.display = 'flex';
+    
+    const wrapper = document.querySelector('.responsive-app-wrapper');
+    if (wrapper) {
+        wrapper.classList.remove('sidebar-open');
+    }
+}
 
+function promptManagerAccess(e) { 
+    e.preventDefault(); 
+    document.getElementById('securityGateModal').style.display = 'flex'; 
+    
+    document.querySelector('.responsive-app-wrapper')?.classList.remove('sidebar-open');
+}
 
+function resetOrderSession() { 
+    if (confirm("Clear active cart and session?")) { 
+        // Close sidebar on mobile
+        document.querySelector('.responsive-app-wrapper')?.classList.remove('sidebar-open');
+        clearSessionAndReload(); 
+    } 
+}
