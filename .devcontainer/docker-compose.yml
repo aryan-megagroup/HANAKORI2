@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/go:1-1.25-alpine
+    container_name: hanakori_dev_workspace
+    volumes:
+      - ..:/workspace:cached
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_NAME=hanakori_db
+    command: sleep infinity
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: hanakori_dev_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_DATABASE=hanakori_db
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ../init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_dev_data:
