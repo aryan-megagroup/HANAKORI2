@@ -1,0 +1,15 @@
+{
+    "name": "HANAKORI2 Go Dev Workspace",
+    "dockerComposeFile": ["docker-compose.yml"],
+    "service": "web",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.go",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}

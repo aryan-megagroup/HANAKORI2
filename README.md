@@ -31,7 +31,7 @@
 Linux/WSLターミナルを開き、リポジトリのフィーチャーブランチをクローンします：
 
 ```bash
-git clone -b feature/i18n-translations https://github.com/aryan-megagroup/HANAKORI2.git
+git clone https://github.com/aryan-megagroup/HANAKORI2.git
 cd HANAKORI2
 ```
 

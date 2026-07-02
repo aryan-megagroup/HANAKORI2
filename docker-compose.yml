@@ -10,12 +10,8 @@ services:
     env_file:
       - .env
     environment:
-      - BACKEND_PORT=8081
-      - DB_HOST=db             
-      - DB_PORT=3306           
-      - DB_USER=user_hanakori 
-      - DB_PASSWORD=userpassword 
-      - DB_NAME=hanakori_db   
+      - DB_HOST=db
+      - DB_PORT=3306
     depends_on:
       db:
         condition: service_healthy
