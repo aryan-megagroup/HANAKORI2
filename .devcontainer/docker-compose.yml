@@ -1,5 +1,5 @@
-version: '3.8'
-
+version: "3.8"
+ 
 services:
   web:
     image: mcr.microsoft.com/devcontainers/go:1-1.25-alpine
@@ -8,11 +8,14 @@ services:
       - ..:/app:cached
     env_file:
       - ../.env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
     command: sleep infinity
     depends_on:
       db:
         condition: service_healthy
-
+ 
   db:
     image: mysql:8.0
     container_name: hanakori_dev_db
@@ -23,10 +26,20 @@ services:
       - mysql_dev_data:/var/lib/mysql
       - ../init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${DB_ROOT_PASSWORD}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
-
+ 
 volumes:
   mysql_dev_data:
