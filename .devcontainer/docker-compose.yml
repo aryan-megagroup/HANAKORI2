@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  app:
+  web:
     image: mcr.microsoft.com/devcontainers/go:1-1.25-alpine
     container_name: hanakori_dev_workspace
     volumes:
-      - ..:/workspace:cached
+      - ..:/app:cached
     env_file:
       - ../.env
     command: sleep infinity
