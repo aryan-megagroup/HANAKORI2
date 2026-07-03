@@ -12,6 +12,14 @@ func NewGetProductUseCase(repo product.ProductRepository) *GetProductUseCase {
 	return &GetProductUseCase{repo: repo}
 }
 
+func (uc *GetProductUseCase) GetAllAvailable() ([]product.Product, error) {
+	return uc.repo.GetAllAvailable()
+}
+
+func (uc *GetProductUseCase) GetByCategory(category string) ([]product.Product, error) {
+	return uc.repo.GetByCategory(category)
+}
+
 func (uc *GetProductUseCase) Execute(category string) ([]product.Product, error) {
 	products, err := uc.repo.GetAllAvailable()
 	if err != nil {

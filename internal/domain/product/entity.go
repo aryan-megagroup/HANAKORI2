@@ -1,16 +1,16 @@
 package product
 
 type Product struct {
-	MenuID      int    `json:"MenuID"`
-	Name        string `json:"Name"`
-	Price       int    `json:"Price"`
-	Description string `json:"Description"`
-	Category    string `json:"Category"`
-	ImageURL    string `json:"ImageURL"`
-	IsAvailable bool   `json:"IsAvailable"`
+	MenuID      int    `gorm:"primaryKey;autoIncrement;column:menu_id" json:"MenuID"`
+	Name        string `gorm:"type:varchar(100);not null" json:"Name"`
+	Price       int    `gorm:"not null" json:"Price"`
+	Description string `gorm:"type:text" json:"Description"`
+	Category    string `gorm:"type:varchar(50)" json:"Category"`
+	ImageURL    string `gorm:"type:varchar(255)" json:"ImageURL"`
+	IsAvailable bool   `gorm:"default:true" json:"IsAvailable"`
 }
 
 type CartItem struct {
-	Product  Product `json:"Product"`
-	Quantity int     `json:"Quantity"`
+	Product  Product `gorm:"-" json:"Product"`
+	Quantity int     `gorm:"-" json:"Quantity"`
 }
