@@ -1,7 +1,7 @@
 package product
 
 type Product struct {
-	MenuID      int    `gorm:"primaryKey;autoIncrement;column:menu_id" json:"MenuID"` // 👈 Removed type:int
+	MenuID      int    `gorm:"primaryKey;autoIncrement;column:menu_id" json:"MenuID"`
 	Name        string `gorm:"type:varchar(100);not null" json:"Name"`
 	Price       int    `gorm:"not null" json:"Price"`
 	Description string `gorm:"type:text" json:"Description"`
