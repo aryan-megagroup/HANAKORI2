@@ -22,6 +22,10 @@ RUN apk add --no-cache ca-certificates tzdata
 COPY --from=builder /app/main .
 COPY --from=builder /app/public/ ./public/
 
+# Copy the SQL files into the container
+COPY --from=builder /app/internal/infrastructure/database/migrations/ ./internal/infrastructure/database/migrations/
+COPY --from=builder /app/internal/infrastructure/database/seeders/ ./internal/infrastructure/database/seeders/
+
 # Create the uploads directory explicitly so it always exists
 RUN mkdir -p /app/public/uploads
 

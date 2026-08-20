@@ -8,15 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type MySQLProductRepository struct {
+type ProductRepository struct {
 	db *gorm.DB
 }
 
-func NewMySQLProductRepository(db *gorm.DB) *MySQLProductRepository {
-	return &MySQLProductRepository{db: db}
+func NewProductRepository(db *gorm.DB) *ProductRepository {
+	return &ProductRepository{db: db}
 }
 
-func (r *MySQLProductRepository) GetByID(id int) (product.Product, error) {
+func (r *ProductRepository) GetByID(id int) (product.Product, error) {
 	var p product.Product
 	err := r.db.First(&p, id).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -25,19 +25,19 @@ func (r *MySQLProductRepository) GetByID(id int) (product.Product, error) {
 	return p, err
 }
 
-func (r *MySQLProductRepository) GetAll() ([]product.Product, error) {
+func (r *ProductRepository) GetAll() ([]product.Product, error) {
 	var products []product.Product
 	err := r.db.Order("menu_id DESC").Find(&products).Error
 	return products, err
 }
 
-func (r *MySQLProductRepository) GetAllAvailable() ([]product.Product, error) {
+func (r *ProductRepository) GetAllAvailable() ([]product.Product, error) {
 	var products []product.Product
 	err := r.db.Where("is_available = ?", true).Order("menu_id DESC").Find(&products).Error
 	return products, err
 }
 
-func (r *MySQLProductRepository) GetByCategory(category string) ([]product.Product, error) {
+func (r *ProductRepository) GetByCategory(category string) ([]product.Product, error) {
 	var products []product.Product
 
 	if category != "" {
@@ -54,14 +54,14 @@ func (r *MySQLProductRepository) GetByCategory(category string) ([]product.Produ
 	return products, err
 }
 
-func (r *MySQLProductRepository) Create(p *product.Product) error {
+func (r *ProductRepository) Create(p *product.Product) error {
 	return r.db.Create(p).Error
 }
 
-func (r *MySQLProductRepository) Update(p *product.Product) error {
+func (r *ProductRepository) Update(p *product.Product) error {
 	return r.db.Save(p).Error
 }
 
-func (r *MySQLProductRepository) Delete(id int) error {
+func (r *ProductRepository) Delete(id int) error {
 	return r.db.Delete(&product.Product{}, id).Error
 }
