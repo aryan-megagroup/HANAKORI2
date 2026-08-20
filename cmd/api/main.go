@@ -18,9 +18,9 @@ func main() {
 		log.Fatal("CRITICAL CONFIGURATION ERROR: The 'BACKEND_PORT' variable is not defined.")
 	}
 
-	productRepo := repository.NewMySQLProductRepository(database.DB)
-	promoRepo := repository.NewMySQLPromoRepository(database.DB)
-	orderRepo := repository.NewMySQLOrderRepository(database.DB)
+	productRepo := repository.NewProductRepository(database.DB)
+	promoRepo := repository.NewPromoRepository(database.DB)
+	orderRepo := repository.NewOrderRepository(database.DB)
 
 	getProductsUC := product.NewGetProductUseCase(productRepo)
 	cartUC := product.NewCartUseCase(productRepo)

@@ -1,4 +1,4 @@
-#  HANAKORI2 — ショップ管理システム
+# HANAKORI2 — ショップ管理システム
 
 ポータブルでクリーンアーキテクチャベースのレストラン管理プラットフォームです。メニューアイテム、リアルタイムカート状態、プロモーションコード検証、フルフィルメントワークフローを処理するように設計されています。
 
@@ -6,10 +6,10 @@
 
 ## 技術スタック
 
-* **バックエンドランタイム:** Go (Golang 1.25)
-* **データベースエンジン:** MySQL 8.0
-* **フロントエンドレイヤー:** Vanilla JavaScript、HTML5、CSS3
-* **コンテナ化:** Docker & Docker Compose
+- **バックエンドランタイム:** Go (Golang 1.25)
+- **データベースエンジン:** PostgreSQL
+- **フロントエンドレイヤー:** Vanilla JavaScript、HTML5、CSS3
+- **コンテナ化:** Docker & Docker Compose
 
 ---
 
@@ -17,8 +17,8 @@
 
 このプロジェクトを起動するには、ローカルホストコンピュータまたはWSLサブシステムに以下のユーティリティがインストールされている必要があります：
 
-* **Docker Desktop**（または `compose` プラグインが有効なDocker Engine）
-* **Git**（バージョン管理トラッキング用）
+- **Docker Desktop**（または `compose` プラグインが有効なDocker Engine）
+- **Git**（バージョン管理トラッキング用）
 
 ---
 
@@ -49,10 +49,10 @@ curl -i http://localhost:8081/api/products
 
 ---
 
-##  Dockerコマンドリファレンス
+## Dockerコマンドリファレンス
 
-| コマンド | 説明 |
-|---------|------|
-| `docker-compose up --build -d` | アプリケーションを起動 |
-| `docker ps` | コンテナのステータスを確認 |
-| `docker-compose logs -f web` | アプリケーションのライブログを監視 |
+| コマンド                       | 説明                               |
+| ------------------------------ | ---------------------------------- |
+| `docker-compose up --build -d` | アプリケーションを起動             |
+| `docker ps`                    | コンテナのステータスを確認         |
+| `docker-compose logs -f web`   | アプリケーションのライブログを監視 |
