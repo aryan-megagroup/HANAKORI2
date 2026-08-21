@@ -26,14 +26,21 @@ func SetupRouter(handler *ProductHandler) *gin.Engine {
 		c.Next()
 	})
 
+	// Legacy Static Assets
 	r.Static("/css", "./public/css")
 	r.Static("/js", "./public/js")
 	r.Static("/uploads", "./public/uploads")
 	r.StaticFile("/manager-script.js", "./public/js/manager-scrip.js")
 	r.StaticFile("/manager-style.css", "./public/manager-style.css")
-	r.StaticFile("/", "./public/index.html")
-	r.StaticFile("/manager.html", "./public/manager.html")
 
+	// Legacy HTML Entry Points
+	r.StaticFile("/manager.html", "./public/manager.html")
+	r.StaticFile("/legacy.html", "./public/index.html")
+
+	// React Frontend Assets
+	r.Static("/assets", "./frontend/dist/assets")
+
+	// API Routing
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/products", handler.HandleGetProducts)
@@ -52,6 +59,11 @@ func SetupRouter(handler *ProductHandler) *gin.Engine {
 		apiGroup.POST("/update_order_status", handler.HandleUpdateOrderStatus)
 		apiGroup.POST("/submit_order", handler.HandleSubmitOrderLine)
 	}
+
+	// React Catch-All (Must be at the end to support React Router)
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./frontend/dist/index.html")
+	})
 
 	return r
 }
