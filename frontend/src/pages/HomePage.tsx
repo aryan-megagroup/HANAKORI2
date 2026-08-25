@@ -51,9 +51,7 @@ function HomePage() {
         </h1>
 
         <div className="mt-6">
-          <Button>
-            Kakigori Button
-          </Button>
+          <Button>Kakigori Button</Button>
         </div>
 
         {loading && (
@@ -94,10 +92,10 @@ function HomePage() {
                 </p>
 
                 <span
-                  className={`inline-block rounded-full px-2 py-1 text-xs ${
-                    product.IsAvailable
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
+                  className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
+                  product.IsAvailable
+                    ? 'bg-secondary text-secondary-foreground'
+                    : 'bg-danger text-danger-foreground'
                   }`}
                 >
                   {product.IsAvailable ? 'Available' : 'Sold Out'}
