@@ -1,17 +1,23 @@
-import VideoBackground from '@/components/layout/VideoBackground';
+import { useState } from "react";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
+import VideoBackground from "@/components/layout/VideoBackground";
 
 function HomePage() {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   return (
     <>
       <VideoBackground />
-      
-      <div className="flex min-h-screen text-foreground">      
 
-        {/* TEMPORARY TEXT TO BE REMOVED AND OTHER COMPONENT TO BE ADDED BELOW */}
-        <main className="flex-1 p-8 relative z-10">
-          <h1 className="text-3xl font-bold text-white drop-shadow-md">
-            HANAKORI2 React UI
-          </h1>
+      <div className="min-h-screen font-sans relative z-10 flex flex-col">
+        <DashboardHeader
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onToggleSidebar={() => {
+          }}
+        />
+
+        <main className="mx-auto w-full max-w-7xl flex-1 p-6 md:p-8">
         </main>
       </div>
     </>
