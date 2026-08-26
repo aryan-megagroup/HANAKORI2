@@ -24,7 +24,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 <Button
                     variant="ghost"
                     size="icon"
-                    className="-ml-2 h-8 w-8 text-foreground hover:bg-muted"
+                    className="md:hidden -ml-2 h-8 w-8 text-foreground hover:bg-muted"
                     onClick={onToggleSidebar}
                     aria-label="Toggle Menu"
                 >
