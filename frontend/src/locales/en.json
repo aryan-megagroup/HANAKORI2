@@ -1,0 +1,7 @@
+{
+    "customer": {
+        "greeting": "Hello 👋",
+        "subgreeting": "Please choose your favorite shaved ice",
+        "search_placeholder": "Search..."
+    }
+}

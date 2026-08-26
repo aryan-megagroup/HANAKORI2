@@ -1,0 +1,7 @@
+{
+    "customer": {
+        "greeting": "こんにちは 👋",
+        "subgreeting": "お好きなかき氷をお選びください",
+        "search_placeholder": "メニューを検索..."
+    }
+}
