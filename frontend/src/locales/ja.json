@@ -1,9 +1,19 @@
 {
-    "customer": {
-        "greeting": "こんにちは 👋",
-        "subgreeting": "お好きなかき氷をお選びください",
-        "search_placeholder": "メニューを検索...",
-        "special_treats": "SPECIAL TREATS",
-        "default_promo": "華こおりへようこそ！"
+  "customer": {
+    "greeting": "こんにちは 👋",
+    "subgreeting": "お好きなかき氷をお選びください",
+    "search_placeholder": "メニューを検索...",
+    "special_treats": "SPECIAL TREATS",
+    "default_promo": "華こおりへようこそ！",
+    "categories": {
+      "all": "すべて",
+      "snack": "スナック",
+      "ice": "かき氷"
+    },
+    "status": {
+      "loading_products": "商品を読み込んでいます...",
+      "error": "エラー",
+      "no_products": "このカテゴリーの商品は見つかりませんでした。"
     }
+  }
 }
