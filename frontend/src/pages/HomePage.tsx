@@ -7,7 +7,6 @@ import PromoBanner from "@/components/layout/PromoBanner";
 import { MenuCategoryTabs } from '@/components/product/MenuCategoryTabs';
 import type { CategoryType } from '@/components/product/MenuCategoryTabs';
 
-
 interface Product {
   MenuID: number;
   Name: string;
@@ -19,16 +18,15 @@ interface Product {
 }
 
 function HomePage() {
-
   const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const [activeCategory, setActiveCategory] = useState<CategoryType>('All');
 
   useEffect(() => {
@@ -70,7 +68,7 @@ function HomePage() {
     if (activeCategory === 'All') return true;
     if (activeCategory === 'Snack') return product.Category === 'スナック';
     if (activeCategory === 'Ice') return product.Category === 'かき氷本体';
-    
+
     return true;
   });
 
@@ -99,12 +97,16 @@ function HomePage() {
             onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
           />
 
-          <main className="w-full px-6 pb-8 md:px-8 pt-2">          
-            <PromoBanner />              
+          <main className="w-full px-6 pb-8 md:px-8">
+
+            <div className="px-3 pt-2">
+              <PromoBanner />
+            </div>
+
             <div className="flex flex-col gap-6 pt-4">
-              <MenuCategoryTabs 
-                activeCategory={activeCategory} 
-                onCategoryChange={setActiveCategory} 
+              <MenuCategoryTabs
+                activeCategory={activeCategory}
+                onCategoryChange={setActiveCategory}
               />
 
               {loading && <p className="text-muted-foreground"> {t('customer.status.loading_products')}</p>}
