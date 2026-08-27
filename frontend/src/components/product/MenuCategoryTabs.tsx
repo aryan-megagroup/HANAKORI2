@@ -46,7 +46,7 @@ export const MenuCategoryTabs: React.FC<MenuCategoryTabsProps> = ({
           <TabsTrigger
             key={tab.id}
             value={tab.id}
-            className="whitespace-nowrap rounded-full px-6 py-2.5 text-base font-semibold transition-all duration-200 outline-none data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_4px_12px_rgba(255,192,203,0.8)] data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-slate-50"
+            className="whitespace-nowrap rounded-full px-6 py-2.5 text-base font-semibold transition-all duration-200 outline-none hover:-translate-y-1 hover:shadow-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_4px_12px_rgba(255,192,203,0.8)] data-[state=active]:hover:shadow-[0_6px_16px_rgba(255,192,203,0.9)] data-[state=inactive]:bg-transparent data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-slate-50"
           >
             {tab.label}
           </TabsTrigger>
