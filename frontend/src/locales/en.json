@@ -1,7 +1,9 @@
 {
     "customer": {
         "greeting": "Hello 👋",
-        "subgreeting": "Please choose your favorite shaved ice",
-        "search_placeholder": "Search..."
+        "subgreeting": "Please choose your favorite Kakigori",
+        "search_placeholder": "Search menu...",
+        "special_treats": "SPECIAL TREATS",
+        "default_promo": "Welcome to Hana Koori!"
     }
 }

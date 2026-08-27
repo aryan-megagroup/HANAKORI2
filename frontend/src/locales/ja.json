@@ -2,6 +2,8 @@
     "customer": {
         "greeting": "こんにちは 👋",
         "subgreeting": "お好きなかき氷をお選びください",
-        "search_placeholder": "メニューを検索..."
+        "search_placeholder": "メニューを検索...",
+        "special_treats": "SPECIAL TREATS",
+        "default_promo": "華こおりへようこそ！"
     }
 }
