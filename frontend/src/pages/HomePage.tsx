@@ -1,8 +1,8 @@
 import { useState } from 'react';
-
 import { DashboardHeader } from '@/components/layout/DashboardHeader';
 import { SidebarNav } from '@/components/layout/SidebarNav';
 import VideoBackground from '@/components/layout/VideoBackground';
+import PromoBanner from "@/components/layout/PromoBanner";
 
 function HomePage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -14,7 +14,6 @@ function HomePage() {
 
   const handleResetSession = () => {
     console.log('Reset session');
-
     // TODO: Add actual session reset logic
   };
 
@@ -46,7 +45,8 @@ function HomePage() {
             }}
           />
 
-          <main className="w-full px-6 pb-8 md:px-8">
+          <main className="mx-auto w-full max-w-7xl flex-1 px-6 pt-3 pb-8 md:px-8 md:pt-3 md:pb-8">
+            <PromoBanner />
             {/* TODO: Add HomePage content here */}
           </main>
         </div>
