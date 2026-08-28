@@ -30,7 +30,7 @@ func SetupRouter(handler *ProductHandler) *gin.Engine {
 	r.Static("/css", "./public/css")
 	r.Static("/js", "./public/js")
 	r.Static("/uploads", "./public/uploads")
-	r.StaticFile("/manager-script.js", "./public/js/manager-scrip.js")
+	r.StaticFile("/manager-scrip.js", "./public/js/manager-scrip.js")
 	r.StaticFile("/manager-style.css", "./public/manager-style.css")
 
 	// Legacy HTML Entry Points
