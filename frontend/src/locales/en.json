@@ -4,6 +4,8 @@
         "subgreeting": "Please choose your favorite Kakigori",
         "search_placeholder": "Search menu...",
         "special_treats": "SPECIAL TREATS",
-        "default_promo": "Welcome to Hana Koori!"
+        "default_promo": "Welcome to Hana Koori!",
+        "order_customize": "Order / Customize",
+        "sold_out": "Sold Out"
     }
 }
