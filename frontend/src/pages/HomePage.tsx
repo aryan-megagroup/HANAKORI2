@@ -36,7 +36,7 @@ function HomePage() {
         if (err instanceof Error) {
           setError(err.message);
         } else {
-          setError('An unknown error occurred');
+          setError(t('customer.status.unknown_error'));
         }
       } finally {
         setLoading(false);
@@ -44,7 +44,7 @@ function HomePage() {
     };
 
     fetchProducts();
-  }, []);
+  }, [t]);
 
   const handleHome = () => {
     console.log('Home clicked');
@@ -102,11 +102,13 @@ function HomePage() {
           `}
         >
           <DashboardHeader
+            title={t('customer.greeting')}
+            subtitle={t('customer.subgreeting')}
             searchQuery={searchQuery}
+            searchPlaceholder={t('customer.search_placeholder')}
+            showSearch={true}
             onSearchChange={setSearchQuery}
-            onToggleSidebar={() =>
-              setIsSidebarOpen((prev) => !prev)
-            }
+            onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
           />
 
           <main className="w-full px-6 pb-8 md:px-8">
@@ -122,13 +124,13 @@ function HomePage() {
 
               {loading && (
                 <p className="text-muted-foreground">
-                  {t('manager.loading_products')}
+                  {t('customer.status.loading_products')}
                 </p>
               )}
 
               {error && (
                 <p className="font-bold text-danger">
-                  {t('customer.status.error', 'Error')}: {error}
+                  {t('customer.status.error')}: {error}
                 </p>
               )}
 
@@ -136,10 +138,7 @@ function HomePage() {
                 !error &&
                 filteredProducts.length === 0 && (
                   <p className="text-muted-foreground">
-                    {t(
-                      'customer.no_items',
-                      '現在、このカテゴリーには商品がありません。'
-                    )}
+                    {t('customer.status.no_products')}
                   </p>
                 )}
 
