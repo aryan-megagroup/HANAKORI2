@@ -7,13 +7,7 @@ interface MenuGridProps {
 
 function MenuGrid({ products }: MenuGridProps) {
   return (
-    <div
-      className="
-        grid
-        grid-cols-[repeat(auto-fill,minmax(180px,1fr))]
-        gap-4
-      "
-    >
+    <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5">
       {products.map((product) => (
         <ProductCard
           key={product.MenuID}

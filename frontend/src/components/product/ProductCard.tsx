@@ -18,6 +18,7 @@ function ProductCard({ product }: ProductCardProps) {
   return (
     <Card
       className={`
+        min-h-[280px]
         overflow-hidden
         border-0
         bg-card
@@ -31,10 +32,10 @@ function ProductCard({ product }: ProductCardProps) {
         <div
           className={`
             relative
-            aspect-[4/3]
+            h-[160px]
             w-full
             overflow-hidden
-            rounded-lg
+            rounded-md
             bg-muted
             ${!product.IsAvailable ? 'grayscale' : ''}
           `}
