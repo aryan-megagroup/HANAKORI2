@@ -7,5 +7,9 @@
         "default_promo": "Welcome to Hana Koori!",
         "order_customize": "Order / Customize",
         "sold_out": "Sold Out"
+    },
+    "manager_access": {
+        "title": "Manager Access",
+        "authenticate": "Authenticate"
     }
 }
