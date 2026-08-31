@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import type { Product } from '@/types/product';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import type { Product } from "@/types/product";
 
 interface ProductCardProps {
   product: Product;
@@ -18,26 +18,27 @@ function ProductCard({ product }: ProductCardProps) {
   return (
     <Card
       className={`
-        min-h-[280px]
+        w-full
         overflow-hidden
+        rounded-[15px]
         border-0
-        bg-card
+        bg-white
         shadow-md
         transition-shadow
         duration-200
-        ${product.IsAvailable ? 'hover:shadow-lg' : ''}
+        ${product.IsAvailable ? "hover:shadow-lg" : ""}
       `}
     >
-      <div className="p-4 pb-0">
+      <div className="p-[17px] pb-0">
         <div
           className={`
             relative
             h-[160px]
             w-full
             overflow-hidden
-            rounded-md
+            rounded-lg
             bg-muted
-            ${!product.IsAvailable ? 'grayscale' : ''}
+            ${!product.IsAvailable ? "grayscale" : ""}
           `}
         >
           {hasImage ? (
@@ -49,21 +50,21 @@ function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
-              {t('manager.product_image', '商品画像')}
+              {t("manager.product_image", "商品画像")}
             </div>
           )}
 
           {!product.IsAvailable && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/10">
               <span className="rounded-md bg-muted px-3 py-1 text-sm font-bold text-muted-foreground">
-                {t('customer.sold_out')}
+                {t("customer.sold_out")}
               </span>
             </div>
           )}
         </div>
       </div>
 
-      <CardContent className="flex flex-1 flex-col pt-3">
+      <CardContent className="flex flex-1 flex-col px-[17px] pb-[17px] pt-2">
         <h3 className="min-h-[1.75rem] text-base font-bold leading-7 text-foreground">
           {product.Name}
         </h3>
@@ -76,20 +77,21 @@ function ProductCard({ product }: ProductCardProps) {
           type="button"
           disabled={!product.IsAvailable}
           className="
-            mt-4
+            mt-3
+            h-[39px]
             w-full
-            rounded-lg
+            rounded-[8px]
             bg-primary
             font-semibold
             text-primary-foreground
-            hover:bg-primary-hover
+           hover:bg-primary-hover
             disabled:cursor-not-allowed
             disabled:opacity-60
           "
         >
           {product.IsAvailable
-            ? t('customer.order_customize')
-            : t('customer.sold_out')}
+            ? t("customer.order_customize")
+            : t("customer.sold_out")}
         </Button>
       </CardContent>
     </Card>

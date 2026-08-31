@@ -1,5 +1,5 @@
-import ProductCard from '@/components/product/ProductCard';
-import type { Product } from '@/types/product';
+import ProductCard from "@/components/product/ProductCard";
+import type { Product } from "@/types/product";
 
 interface MenuGridProps {
   products: Product[];
@@ -7,12 +7,18 @@ interface MenuGridProps {
 
 function MenuGrid({ products }: MenuGridProps) {
   return (
-    <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-5">
+    <div
+      className="
+    grid
+    w-full
+    grid-cols-1
+    gap-5
+    sm:grid-cols-2
+    lg:grid-cols-4
+  "
+    >
       {products.map((product) => (
-        <ProductCard
-          key={product.MenuID}
-          product={product}
-        />
+        <ProductCard key={product.MenuID} product={product} />
       ))}
     </div>
   );
