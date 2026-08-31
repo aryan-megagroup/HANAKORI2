@@ -9,6 +9,7 @@ import PromoBanner from '@/components/layout/PromoBanner';
 import MenuGrid from '@/components/product/MenuGrid';
 import { MenuCategoryTabs } from '@/components/product/MenuCategoryTabs';
 import type { CategoryType } from '@/components/product/MenuCategoryTabs';
+import { ManagerAccessModal } from '@/components/features/ManagerAccessModal';
 
 import { getProducts } from '@/services/menuApi';
 import type { Product } from '@/types/product';
@@ -23,8 +24,8 @@ function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [activeCategory, setActiveCategory] =
-    useState<CategoryType>('All');
+  const [activeCategory, setActiveCategory] = useState<CategoryType>('All');
+  const [isManagerModalOpen, setIsManagerModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -51,7 +52,6 @@ function HomePage() {
 
   const handleResetSession = () => {
     console.log('Reset session');
-    // TODO: Add actual session reset logic
   };
 
   const filteredProducts = products.filter((product) => {
@@ -59,21 +59,10 @@ function HomePage() {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
-    if (!matchesSearch) {
-      return false;
-    }
-
-    if (activeCategory === 'All') {
-      return true;
-    }
-
-    if (activeCategory === 'Snack') {
-      return product.Category === 'スナック';
-    }
-
-    if (activeCategory === 'Ice') {
-      return product.Category === 'かき氷本体';
-    }
+    if (!matchesSearch) return false;
+    if (activeCategory === 'All') return true;
+    if (activeCategory === 'Snack') return product.Category === 'スナック';
+    if (activeCategory === 'Ice') return product.Category === 'かき氷本体';
 
     return true;
   });
@@ -88,6 +77,7 @@ function HomePage() {
           onResetSession={handleResetSession}
           isMobileOpen={isSidebarOpen}
           onMobileOpenChange={setIsSidebarOpen}
+          onManagerAccessClick={() => setIsManagerModalOpen(true)}
         />
 
         <div
@@ -106,8 +96,10 @@ function HomePage() {
             }
           />
 
-          <main className="w-full px-6 pb-8 pt-2 md:px-8">
-            <PromoBanner />
+          <main className="w-full px-6 pb-8 md:px-8">
+            <div className="px-3 pt-2">
+              <PromoBanner />
+            </div>
 
             <div className="flex flex-col gap-6 pt-4">
               <MenuCategoryTabs
@@ -144,6 +136,11 @@ function HomePage() {
                   <MenuGrid products={filteredProducts} />
                 )}
             </div>
+
+            <ManagerAccessModal
+              isOpen={isManagerModalOpen}
+              onClose={() => setIsManagerModalOpen(false)}
+            />
           </main>
         </div>
       </div>

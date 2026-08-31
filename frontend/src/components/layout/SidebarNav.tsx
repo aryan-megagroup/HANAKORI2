@@ -18,6 +18,7 @@ interface SidebarNavProps {
   onResetSession: () => void;
   isMobileOpen?: boolean;
   onMobileOpenChange?: (open: boolean) => void;
+  onManagerAccessClick?: () => void;
 }
 
 export function SidebarNav({
@@ -25,6 +26,7 @@ export function SidebarNav({
   onResetSession,
   isMobileOpen = false,
   onMobileOpenChange,
+  onManagerAccessClick,
 }: SidebarNavProps) {
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
@@ -36,6 +38,13 @@ export function SidebarNav({
   const handleResetSession = () => {
     onResetSession();
     setResetDialogOpen(false);
+    onMobileOpenChange?.(false);
+  };
+
+  const handleManagerAccess = () => {
+    if (onManagerAccessClick) {
+      onManagerAccessClick();
+    }
     onMobileOpenChange?.(false);
   };
 
@@ -84,6 +93,7 @@ export function SidebarNav({
           {/* Manager */}
           <Button
             variant="ghost"
+            onClick={handleManagerAccess}
             className="
               h-14 w-full justify-start gap-4
               rounded-xl px-4

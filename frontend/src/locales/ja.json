@@ -17,5 +17,9 @@
       "error": "エラー",
       "no_products": "このカテゴリーの商品は見つかりませんでした。"
     }
+  },
+  "manager_access": {
+    "title": "マネージャーアクセス",
+    "authenticate": "認証"
   }
 }
