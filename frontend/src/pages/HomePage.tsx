@@ -59,10 +59,23 @@ function HomePage() {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
-    if (!matchesSearch) return false;
-    if (activeCategory === 'All') return true;
-    if (activeCategory === 'Snack') return product.Category === 'スナック';
-    if (activeCategory === 'Ice') return product.Category === 'かき氷本体';
+    if (!matchesSearch) {
+      return false;
+    }
+
+    if (activeCategory === 'All') {
+      return true;
+    }
+
+    const dbCategory = product.Category?.trim().toLowerCase() || "";
+
+    if (activeCategory === 'Snack') {
+      return dbCategory === 'スナック' || dbCategory === 'snack' || dbCategory === 'snacks';
+    }
+
+    if (activeCategory === 'Ice') {
+      return dbCategory === 'かき氷本体' || dbCategory === 'ice' || dbCategory === 'kakigori';
+    }
 
     return true;
   });
