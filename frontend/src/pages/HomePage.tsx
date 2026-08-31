@@ -149,13 +149,14 @@ function HomePage() {
                 )}
             </div>
 
-            <ManagerAccessModal
-              isOpen={isManagerModalOpen}
-              onClose={() => setIsManagerModalOpen(false)}
-            />
           </main>
         </div>
       </div>
+
+      <ManagerAccessModal
+        isOpen={isManagerModalOpen}
+        onClose={() => setIsManagerModalOpen(false)}
+      />
     </>
   );
 }
